@@ -1,0 +1,24 @@
+# Recommended Python: 3.12.x
+# This backend uses MediaPipe, which may not provide stable wheels for Python 3.13.
+
+# Django backend
+Django==6.0.2
+djangorestframework>=3.15,<3.16
+django-cors-headers>=4.6,<5
+Pillow>=10,<12
+
+# Numeric and image/video processing
+numpy<2
+opencv-python-headless>=4.10,<5
+
+# Pose pipeline
+mediapipe>=0.10,<0.11
+
+# Optional: only needed if you use YOLO mode in pipeline/climbing_spots_pipeline.py
+ultralytics>=8.3,<9
+
+# HTTP client for Roboflow hosted inference (hold detection)
+requests>=2.28
+
+# Optional: model-assisted wall calibration
+openai>=1.0.0

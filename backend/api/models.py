@@ -46,6 +46,8 @@ class Job(models.Model):
         # --- Stage 1/2 intermediate artifacts ---
     hold_annotated_image = models.ImageField(upload_to="hold_annotated/", null=True, blank=True)
     hold_overlay_image = models.ImageField(upload_to="hold_overlays/", null=True, blank=True)
+    pose_result_image = models.ImageField(upload_to="pose_results/", null=True, blank=True)
+    clean_summary_image = models.ImageField(upload_to="clean_summaries/", null=True, blank=True)
 
     holds_json = models.JSONField(null=True, blank=True)
     projected_pose_json = models.JSONField(null=True, blank=True)

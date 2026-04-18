@@ -92,7 +92,7 @@ def draw_projected_holds_on_reference(ref_img_bgr, projected_holds_json):
 
 # ── main pipeline ─────────────────────────────────────────────────────────────
 
-def build_projected_hold_summary_for_job(job, *, n_frames: int = 6):
+def build_projected_hold_summary_for_job(job, *, n_frames: int = 7):
     """
     Detect holds across multiple video frames to overcome occlusion by the climber.
 
@@ -164,7 +164,7 @@ def build_projected_hold_summary_for_job(job, *, n_frames: int = 6):
     # ── Step 4: deduplicate and filter by frame support ───────────────────────
     # Require a hold to appear in at least ceil(2/3 × n_frames) distinct frames.
     # This rejects false positives from the climber's body, which moves between frames.
-    min_frame_votes = max(2, math.ceil(num_frames_used * 2 / 3))
+    min_frame_votes = max(2, math.ceil(num_frames_used * 1 / 2))
     unique_holds = _nms_holds(all_holds, iou_threshold=0.3, min_frame_votes=min_frame_votes)
 
     # Renumber IDs sequentially

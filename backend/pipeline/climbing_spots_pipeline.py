@@ -25,7 +25,19 @@ except ImportError:
     YOLO_AVAILABLE = False
 
 # Pose landmark indices (same as MediaPipe PoseLandmark enum)
-# Hands: use INDEX (19,20) for contact point on hold; more accurate than wrist
+# Body joints for stick figure
+NOSE           = 0
+LEFT_ELBOW     = 13
+RIGHT_ELBOW    = 14
+LEFT_SHOULDER  = 11
+RIGHT_SHOULDER = 12
+LEFT_HIP       = 23
+RIGHT_HIP      = 24
+LEFT_KNEE      = 25
+RIGHT_KNEE     = 26
+# Hands: midpoint of wrist (15/16) and index finger (19/20)
+LEFT_WRIST = 15
+RIGHT_WRIST = 16
 LEFT_INDEX = 19
 RIGHT_INDEX = 20
 LEFT_ANKLE = 27
@@ -33,7 +45,7 @@ RIGHT_ANKLE = 28
 LEFT_FOOT_INDEX = 31  # toe
 RIGHT_FOOT_INDEX = 32
 
-HAND_INDICES = (LEFT_INDEX, RIGHT_INDEX)
+HAND_INDICES = (LEFT_WRIST, RIGHT_WRIST, LEFT_INDEX, RIGHT_INDEX)
 FOOT_ANKLE_INDICES = (LEFT_ANKLE, RIGHT_ANKLE)
 FOOT_TOE_INDICES = (LEFT_FOOT_INDEX, RIGHT_FOOT_INDEX)
 
@@ -199,15 +211,25 @@ def extract_spots(frame_rgb: np.ndarray, landmarker) -> list[tuple[int, int, str
 
     landmarks = result.pose_landmarks[0]
 
-    # Left hand: index finger (19)
-    pt = _get_visible_xy(landmarks, LEFT_INDEX, w, h)
-    if pt is not None:
-        spots.append((int(pt[0]), int(pt[1]), "LH"))
+    # Left hand: midpoint of wrist (15) and index finger (19); fall back to whichever is visible
+    wrist_pt = _get_visible_xy(landmarks, LEFT_WRIST, w, h)
+    index_pt = _get_visible_xy(landmarks, LEFT_INDEX, w, h)
+    if wrist_pt is not None and index_pt is not None:
+        spots.append((int((wrist_pt[0] + index_pt[0]) / 2), int((wrist_pt[1] + index_pt[1]) / 2), "LH"))
+    elif wrist_pt is not None:
+        spots.append((int(wrist_pt[0]), int(wrist_pt[1]), "LH"))
+    elif index_pt is not None:
+        spots.append((int(index_pt[0]), int(index_pt[1]), "LH"))
 
-    # Right hand: index finger (20)
-    pt = _get_visible_xy(landmarks, RIGHT_INDEX, w, h)
-    if pt is not None:
-        spots.append((int(pt[0]), int(pt[1]), "RH"))
+    # Right hand: midpoint of wrist (16) and index finger (20); fall back to whichever is visible
+    wrist_pt = _get_visible_xy(landmarks, RIGHT_WRIST, w, h)
+    index_pt = _get_visible_xy(landmarks, RIGHT_INDEX, w, h)
+    if wrist_pt is not None and index_pt is not None:
+        spots.append((int((wrist_pt[0] + index_pt[0]) / 2), int((wrist_pt[1] + index_pt[1]) / 2), "RH"))
+    elif wrist_pt is not None:
+        spots.append((int(wrist_pt[0]), int(wrist_pt[1]), "RH"))
+    elif index_pt is not None:
+        spots.append((int(index_pt[0]), int(index_pt[1]), "RH"))
 
     # Left foot: midpoint of ankle (27) and toe (31) when both visible
     ankle_pt = _get_visible_xy(landmarks, LEFT_ANKLE, w, h)
@@ -224,6 +246,22 @@ def extract_spots(frame_rgb: np.ndarray, landmarker) -> list[tuple[int, int, str
         spots.append((int((ankle_pt[0] + toe_pt[0]) / 2), int((ankle_pt[1] + toe_pt[1]) / 2), "RF"))
     elif ankle_pt is not None:
         spots.append((int(ankle_pt[0]), int(ankle_pt[1]), "RF"))
+
+    # Body landmarks for stick figure (not used for hold matching)
+    for idx, kind in [
+        (NOSE,           "NOSE"),
+        (LEFT_SHOULDER,  "LSHO"),
+        (RIGHT_SHOULDER, "RSHO"),
+        (LEFT_ELBOW,     "LELB"),
+        (RIGHT_ELBOW,    "RELB"),
+        (LEFT_HIP,       "LHIP"),
+        (RIGHT_HIP,      "RHIP"),
+        (LEFT_KNEE,      "LKNE"),
+        (RIGHT_KNEE,     "RKNE"),
+    ]:
+        pt = _get_visible_xy(landmarks, idx, w, h)
+        if pt is not None:
+            spots.append((int(pt[0]), int(pt[1]), kind))
 
     return spots
 

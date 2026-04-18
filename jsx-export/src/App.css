@@ -8,7 +8,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .cv-brand {
@@ -27,11 +27,10 @@
 .cv-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto 1fr;
-  gap: 0 16px;
+  gap: 16px;
 }
 @media (max-width: 960px) {
-  .cv-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .cv-grid { grid-template-columns: 1fr; }
 }
 
 .cv-section-head {

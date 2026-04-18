@@ -10,6 +10,8 @@ class JobSerializer(serializers.ModelSerializer):
     reference_rectified_image_url = serializers.SerializerMethodField()
 
     hold_overlay_image_url = serializers.SerializerMethodField()
+    pose_result_image_url = serializers.SerializerMethodField()
+    clean_summary_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -37,6 +39,8 @@ class JobSerializer(serializers.ModelSerializer):
 
             # Stage 1/2 intermediate artifacts
             "hold_overlay_image_url",
+            "pose_result_image_url",
+            "clean_summary_image_url",
             "holds_json",
             "projected_pose_json",
             "projected_holds_json",
@@ -66,3 +70,9 @@ class JobSerializer(serializers.ModelSerializer):
 
     def get_hold_overlay_image_url(self, obj: Job):
         return self._build_url(self.context.get("request"), getattr(obj, "hold_overlay_image", None))
+
+    def get_pose_result_image_url(self, obj: Job):
+        return self._build_url(self.context.get("request"), getattr(obj, "pose_result_image", None))
+
+    def get_clean_summary_image_url(self, obj: Job):
+        return self._build_url(self.context.get("request"), getattr(obj, "clean_summary_image", None))

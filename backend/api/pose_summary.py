@@ -180,7 +180,7 @@ def build_pose_trajectory_for_job(job, *, pose_model: str = "lite", sample_fps: 
     if not ok:
         raise RuntimeError("failed to encode pose trajectory image")
 
-    job.result_image.save(
+    job.pose_result_image.save(
         f"{job.id}_pose_trajectory.jpg",
         ContentFile(encoded.tobytes()),
         save=False,
@@ -192,4 +192,4 @@ def build_pose_trajectory_for_job(job, *, pose_model: str = "lite", sample_fps: 
     }
     job.message = f"pose trajectory ready ({len(all_spots)} spots across {frame_idx} frames)"
     job.status = job.Status.DONE
-    job.save(update_fields=["result_image", "projected_pose_json", "message", "status", "updated_at"])
+    job.save(update_fields=["pose_result_image", "projected_pose_json", "message", "status", "updated_at"])
